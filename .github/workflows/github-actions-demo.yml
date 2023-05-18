@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: compiled-code
-          path: /var/www  
+          path: /home/runner/work/git-ci-cd-test/
   
   deploy:
     needs: build
