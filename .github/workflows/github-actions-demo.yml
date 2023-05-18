@@ -63,15 +63,15 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: compiled-code
-          path: dist
+          path: /home/runner/work/git-ci-cd-test/
 
       # Étapes de déploiement de votre API vers le VPS DigitalOcean
       - name: Install SSH client
-        run: apt-get install openssh-client -y
+        run: sudo apt-get install openssh-client -y
 
       - name: Copy files to VPS
         run: |
-          scp -r dist ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
+          scp -r compiled-code ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
 
       - name: Connect to VPS and deploy
         uses: appleboy/ssh-action@master
