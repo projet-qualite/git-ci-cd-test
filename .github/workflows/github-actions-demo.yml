@@ -23,12 +23,15 @@ jobs:
       - run: npm install
       - name: Run npm audit 
         run: npm audit --json > audit.json || echo "No vulnerabilities found."
-      - name: Fail if vulnerabilities
+      - name: Check vulnerabilities
         run: |
-          cat audit.json
-          if [ -s audit.json ]; then
+          VULNERABILITIES=$(cat audit.json | jq -r '.vulnerabilities.total')
+          if [ "$VULNERABILITIES" -gt 0 ]; then
             echo "Vulnerabilities found!"
-            exit 1
+            echo "::set-output name=vulnerabilities::true"
+          else
+            echo "No vulnerabilities found."
+            echo "::set-output name=vulnerabilities::false"
           fi
 
   build:
