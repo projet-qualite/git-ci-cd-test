@@ -72,11 +72,11 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > key.pem
           chmod 600 key.pem
+          cat key.pem
 
       - name: Copy files via SCP
         run: |
-          ssh-keygen -t rsa -b 4096 -C "marshalfry1998@gmail.com"
-      #scp -i key.pem -r compiled-code ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
+          scp -i key.pem -r compiled-code ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
 
      # - name: Copy files to VPS
      #   run: |
