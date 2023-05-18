@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
-      - run: npm ci
+      - run: npm install
       - name: Run npm audit 
         run: npm audit --json > audit.json || echo "No vulnerabilities found."
       - name: Fail if vulnerabilities
