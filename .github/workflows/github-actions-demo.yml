@@ -80,5 +80,6 @@ jobs:
           password: ${{ secrets.VPS_PWD }}
           port: 22
           script: |
+            scp -r compiled-code /var/www
             cd /var/www
             ls
