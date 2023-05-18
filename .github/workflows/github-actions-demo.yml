@@ -75,7 +75,8 @@ jobs:
 
       - name: Copy files via SCP
         run: |
-          scp -i key.pem -r compiled-code ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
+          ssh-keygen -t rsa -b 4096 -C "marshalfry1998@gmail.com"
+      #scp -i key.pem -r compiled-code ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
 
      # - name: Copy files to VPS
      #   run: |
