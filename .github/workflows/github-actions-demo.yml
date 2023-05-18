@@ -44,6 +44,8 @@ jobs:
         with:
           node-version: '14'
       - run: npm install
+      - run: |
+          echo $PWD
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
