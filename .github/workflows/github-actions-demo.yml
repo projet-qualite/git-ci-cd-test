@@ -63,7 +63,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: compiled-code
-          path: /home/runner/work/git-ci-cd-test/
 
       # Étapes de déploiement de votre API vers le VPS DigitalOcean
       - name: Install SSH client
