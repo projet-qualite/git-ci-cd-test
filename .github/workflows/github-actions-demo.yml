@@ -68,6 +68,15 @@ jobs:
       - name: Install SSH client
         run: sudo apt-get install openssh-client -y
 
+      - name: Set up SSH key
+        run: |
+          echo "$SSH_PRIVATE_KEY" > key.pem
+          chmod 600 key.pem
+
+      - name: Copy files via SCP
+        run: |
+          scp -i key.pem -r compiled-code ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
+
      # - name: Copy files to VPS
      #   run: |
      #     scp -r compiled-code ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
@@ -81,6 +90,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            scp -r compiled-code /var/www
             cd /var/www
             ls
