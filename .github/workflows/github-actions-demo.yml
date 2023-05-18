@@ -1,18 +1,80 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: GitHub Actions
+run-name: ${{ github.actor }} is pushing his code
+on: 
+  push:
+    branches:
+      - main
+    tags:
+      - v[12].[0-9]+.[0-9]+
+
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Trigger the deploy job'
 jobs:
-  Explore-GitHub-Actions:
+  audit:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check out repository code
         uses: actions/checkout@v3
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - run: npm ci
+      - name: Run npm audit 
+        run: npm audit --json > audit.json || echo "No vulnerabilities found."
+      - name: Fail if vulnerabilities
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          if [ -s audit.json ]; then
+            echo "Vulnerabilities found!"
+            exit 1
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - run: npm ci
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: compiled-code
+          path: /var/www  
+  
+  deploy:
+    needs: build
+    if: github.event.inputs.deploy == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: compiled-code
+          path: dist
+
+      # Étapes de déploiement de votre API vers le VPS DigitalOcean
+      - name: Install SSH client
+        run: apt-get install openssh-client -y
+
+      - name: Copy files to VPS
+        run: |
+          scp -r dist ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/var/www
+
+      - name: Connect to VPS and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: your-vps-ip
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PWD }}
+          port: 22
+          script: |
+            cd /var/www
+            ls
